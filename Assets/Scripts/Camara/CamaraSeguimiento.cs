@@ -6,15 +6,20 @@ public class CamaraSeguimiento : MonoBehaviour
     Transform objetivo;
 
     [SerializeField]
-    float desfaseY = 2f;
+    float desfaseY = 1.5f;
     [SerializeField]
-    float zonaMuertaY = 1.5f;
+    float zonaMuertaArriba = 2f;
+    [SerializeField]
+    float zonaMuertaAbajo = 0.5f;
     [SerializeField]
     float suavizado = 0.15f;
     [SerializeField]
+    float suavizadoBajada = 0.05f;
+    [SerializeField]
     bool seguirX = false;
 
-    Vector3 velocidadCamara;
+    float velocidadX;
+    float velocidadY;
 
     void Start()
     {
@@ -38,20 +43,27 @@ public class CamaraSeguimiento : MonoBehaviour
         float yObjetivo = objetivo.position.y + desfaseY;
         float yCamara = transform.position.y;
         float yDestino = yCamara;
+        bool bajando = false;
 
-        if (yObjetivo > yCamara + zonaMuertaY)
+        if (yObjetivo > yCamara + zonaMuertaArriba)
         {
-            yDestino = yObjetivo - zonaMuertaY;
+            yDestino = yObjetivo - zonaMuertaArriba;
         }
-        else if (yObjetivo < yCamara - zonaMuertaY)
+        else if (yObjetivo < yCamara - zonaMuertaAbajo)
         {
-            yDestino = yObjetivo + zonaMuertaY;
+            yDestino = yObjetivo + zonaMuertaAbajo;
+            bajando = true;
         }
 
-        float xDestino = seguirX ? objetivo.position.x : transform.position.x;
+        float tiempo = bajando ? suavizadoBajada : suavizado;
+        float y = Mathf.SmoothDamp(yCamara, yDestino, ref velocidadY, tiempo);
 
-        Vector3 destino = new Vector3(xDestino, yDestino, transform.position.z);
+        float x = transform.position.x;
+        if (seguirX)
+        {
+            x = Mathf.SmoothDamp(x, objetivo.position.x, ref velocidadX, suavizado);
+        }
 
-        transform.position = Vector3.SmoothDamp(transform.position, destino, ref velocidadCamara, suavizado);
+        transform.position = new Vector3(x, y, transform.position.z);
     }
 }

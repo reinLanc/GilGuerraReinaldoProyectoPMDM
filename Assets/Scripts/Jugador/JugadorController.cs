@@ -32,8 +32,20 @@ public class JugadorController : MonoBehaviour
     bool saltoPedido = false;
     bool enSuelo = false;
     float ultimoContactoSuelo = -1f;
+    Vector2 velocidadSuelo = Vector2.zero;
     int saltosUsados = 0;
     bool muerto = false;
+    bool desapareciendo = false;
+
+    public bool SinControl
+    {
+        get { return muerto || desapareciendo; }
+    }
+
+    public bool EstaEnSuelo()
+    {
+        return enSuelo;
+    }
 
     void Start()
     {
@@ -46,7 +58,7 @@ public class JugadorController : MonoBehaviour
 
     void Update()
     {
-        if (!muerto)
+        if (!SinControl)
         {
             LeerInput();
         }
@@ -58,7 +70,7 @@ public class JugadorController : MonoBehaviour
     {
         ComprobarSuelo();
 
-        if (!muerto)
+        if (!SinControl)
         {
             Moverse();
             Saltar();
@@ -77,22 +89,39 @@ public class JugadorController : MonoBehaviour
 
     void ComprobarSuelo()
     {
-        if (EstaTocandoSuelo())
+        RaycastHit2D contacto = BuscarSuelo();
+        bool tocando = contacto.collider != null;
+
+        if (tocando)
         {
             ultimoContactoSuelo = Time.time;
         }
 
         enSuelo = Time.time - ultimoContactoSuelo <= tiempoGracia;
+
+        if (tocando && contacto.rigidbody != null)
+        {
+            velocidadSuelo = contacto.rigidbody.linearVelocity;
+        }
+        else
+        {
+            velocidadSuelo = Vector2.zero;
+        }
+    }
+
+    float VelocidadVerticalPropia()
+    {
+        return rb2D.linearVelocityY - velocidadSuelo.y;
     }
 
     void Moverse()
     {
-        rb2D.linearVelocityX = entradaX * velocidad;
+        rb2D.linearVelocityX = entradaX * velocidad + velocidadSuelo.x;
     }
 
     void Saltar()
     {
-        bool estaSubiendo = rb2D.linearVelocityY > umbralVertical;
+        bool estaSubiendo = VelocidadVerticalPropia() > umbralVertical;
 
         if (enSuelo && !estaSubiendo)
         {
@@ -130,11 +159,15 @@ public class JugadorController : MonoBehaviour
         EstadoJugador estado;
 
         // El orden importa pq gana la primera condicion que se cumple
-        if (muerto)
+        if (desapareciendo)
+        {
+            estado = EstadoJugador.Desaparecer;
+        }
+        else if (muerto)
         {
             estado = EstadoJugador.Morir;
         }
-        else if (rb2D.linearVelocityY > umbralVertical)
+        else if (VelocidadVerticalPropia() > umbralVertical)
         {
             if (saltosUsados >= 2)
             {
@@ -161,7 +194,7 @@ public class JugadorController : MonoBehaviour
         return estado;
     }
 
-    bool EstaTocandoSuelo()
+    RaycastHit2D BuscarSuelo()
     {
         Vector2 tamano = new Vector2(boxCollider2d.bounds.size.x - 0.1f, boxCollider2d.bounds.size.y);
 
@@ -183,8 +216,12 @@ public class JugadorController : MonoBehaviour
         rb2D.linearVelocity = Vector2.zero;
     }
 
-    public void Revivir()
+    public void Desaparecer()
     {
-        muerto = false;
+        desapareciendo = true;
+        entradaX = 0f;
+        saltoPedido = false;
+        rb2D.linearVelocity = Vector2.zero;
+        rb2D.simulated = false;
     }
 }

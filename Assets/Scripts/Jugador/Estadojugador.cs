@@ -5,5 +5,7 @@ public enum EstadoJugador
     Saltar,
     Caer,
     DobleSalto,
-    Morir
+    Morir,
+    Desaparecer
 }
+ 

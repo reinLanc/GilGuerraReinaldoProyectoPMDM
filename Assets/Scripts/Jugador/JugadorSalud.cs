@@ -10,12 +10,14 @@ public class JugadorSalud : MonoBehaviour
     [SerializeField]
     int vidasTope = 5;
 
+
     [SerializeField]
     float alturaDano = 7f;
     [SerializeField]
     float alturaPorVidaExtra = 7f;
     [SerializeField]
     int danoMaximoCaida = 2;
+
     [SerializeField]
     float alturaMortal = 30f;
 
@@ -40,7 +42,11 @@ public class JugadorSalud : MonoBehaviour
 
     void Awake()
     {
-        Vidas = vidasMaximas;
+        if (DatosPartida.vidasInicioNivel < 0)
+        {
+            DatosPartida.vidasInicioNivel = vidasMaximas;
+        }
+        Vidas = Mathf.Clamp(DatosPartida.vidasInicioNivel, 1, vidasTope);
     }
 
     void Start()
@@ -130,6 +136,11 @@ public class JugadorSalud : MonoBehaviour
                 finInvulnerabilidad = Time.time + tiempoInvulnerable;
             }
         }
+    }
+
+    public void GuardarVidasParaSiguienteNivel()
+    {
+        DatosPartida.vidasInicioNivel = Vidas;
     }
 
     public void Matar()

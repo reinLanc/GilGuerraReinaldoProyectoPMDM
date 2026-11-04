@@ -21,6 +21,8 @@ public class JugadorSalud : MonoBehaviour
     float duracionMorir = 0.6f;
     [SerializeField]
     float retrasoReinicio = 1.3f;
+    [SerializeField]
+    string escenaGameOver = "GameOver";
     public int Vidas { get; private set; }
 
     JugadorController controlador;
@@ -150,7 +152,8 @@ public class JugadorSalud : MonoBehaviour
 
     void ReiniciarNivel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(escenaGameOver);
     }
 
     void ActualizarParpadeo()

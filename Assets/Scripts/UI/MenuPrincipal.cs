@@ -8,6 +8,7 @@ public class MenuPrincipal : MonoBehaviour
 
     public void Jugar()
     {
+        DatosPartida.NuevaPartida();
         SceneManager.LoadScene(NivelInicio);
     }
 }

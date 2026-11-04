@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[DisallowMultipleComponent]
 public class JugadorController : MonoBehaviour
 {
     InputAction movimientoAction;
@@ -20,10 +19,9 @@ public class JugadorController : MonoBehaviour
     [SerializeField]
     int maxSaltos = 2;
 
-
+    /*Deteccion de suelo*/
     [SerializeField]
     float distanciaSuelo = 0.15f;
-
     [SerializeField]
     float tiempoGracia = 0.1f;
 
@@ -80,7 +78,6 @@ public class JugadorController : MonoBehaviour
     void LeerInput()
     {
         entradaX = movimientoAction.ReadValue<Vector2>().x;
-
         if (saltarAction.WasPressedThisFrame())
         {
             saltoPedido = true;

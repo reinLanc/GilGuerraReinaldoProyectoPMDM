@@ -5,34 +5,26 @@ public class HUDVidas : MonoBehaviour
 {
     TMP_Text texto;
     JugadorSalud salud;
+    int vidasMostradas = -1;
 
     void Start()
     {
         texto = GetComponent<TMP_Text>();
+
         salud = FindFirstObjectByType<JugadorSalud>();
 
         if (salud == null)
         {
             Debug.LogError("No hay ningun JugadorSalud en la escena");
-            enabled = false;
-        }
-        else
-        {
-            salud.VidasCambiadas += Actualizar;
-            Actualizar(salud.Vidas);
         }
     }
 
-    void OnDestroy()
+    void Update()
     {
-        if (salud != null)
+        if (salud != null && salud.Vidas != vidasMostradas)
         {
-            salud.VidasCambiadas -= Actualizar;
+            vidasMostradas = salud.Vidas;
+            texto.text = "Vidas: " + vidasMostradas;
         }
-    }
-
-    void Actualizar(int vidas)
-    {
-        texto.text = "Vidas: " + vidas;
     }
 }

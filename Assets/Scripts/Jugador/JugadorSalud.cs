@@ -1,36 +1,27 @@
-using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-[DisallowMultipleComponent]
 public class JugadorSalud : MonoBehaviour
 {
     [SerializeField]
     int vidasMaximas = 3;
     [SerializeField]
     int vidasTope = 5;
-
-
     [SerializeField]
     float alturaDano = 7f;
     [SerializeField]
     float alturaPorVidaExtra = 7f;
     [SerializeField]
     int danoMaximoCaida = 2;
-
     [SerializeField]
     float alturaMortal = 30f;
-
     [SerializeField]
     float tiempoInvulnerable = 1f;
     [SerializeField]
     float duracionMorir = 0.6f;
     [SerializeField]
     float retrasoReinicio = 1.3f;
-
     public int Vidas { get; private set; }
-
-    public event Action<int> VidasCambiadas;
 
     JugadorController controlador;
     SpriteRenderer spriteRenderer;
@@ -38,7 +29,6 @@ public class JugadorSalud : MonoBehaviour
     float alturaReferencia = 0f;
     bool estabaEnAire = false;
     float finInvulnerabilidad = 0f;
-    bool parpadeando = false;
 
     void Awake()
     {
@@ -112,7 +102,6 @@ public class JugadorSalud : MonoBehaviour
         if (puedeGanar)
         {
             Vidas = Mathf.Min(vidasTope, Vidas + cantidad);
-            VidasCambiadas?.Invoke(Vidas);
         }
 
         return puedeGanar;
@@ -125,7 +114,6 @@ public class JugadorSalud : MonoBehaviour
         if (puedeRecibir)
         {
             Vidas = Mathf.Max(0, Vidas - cantidad);
-            VidasCambiadas?.Invoke(Vidas);
 
             if (Vidas == 0)
             {
@@ -148,7 +136,6 @@ public class JugadorSalud : MonoBehaviour
         if (!controlador.SinControl)
         {
             Vidas = 0;
-            VidasCambiadas?.Invoke(Vidas);
 
             controlador.Morir();
             Invoke(nameof(Desvanecer), duracionMorir);
@@ -168,25 +155,15 @@ public class JugadorSalud : MonoBehaviour
 
     void ActualizarParpadeo()
     {
-        if (Time.time < finInvulnerabilidad)
+        bool invulnerable = Time.time < finInvulnerabilidad && !controlador.SinControl;
+
+        if (invulnerable)
         {
-            bool visible = (int)(Time.time * 10f) % 2 == 0;
-
-            if (visible)
-            {
-                spriteRenderer.color = Color.white;
-            }
-            else
-            {
-                spriteRenderer.color = new Color(1f, 1f, 1f, 0.35f);
-            }
-
-            parpadeando = true;
+            spriteRenderer.enabled = (int)(Time.time * 10f) % 2 == 0;
         }
-        else if (parpadeando)
+        else
         {
-            spriteRenderer.color = Color.white;
-            parpadeando = false;
+            spriteRenderer.enabled = true;
         }
     }
 }

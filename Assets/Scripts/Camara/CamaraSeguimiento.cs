@@ -35,8 +35,6 @@ public class CamaraSeguimiento : MonoBehaviour
     float limiteSuperior = 48f;
 
     Camera camara;
-    float velocidadX;
-    float velocidadY;
 
     void Start()
     {
@@ -49,102 +47,79 @@ public class CamaraSeguimiento : MonoBehaviour
         }
         else
         {
-            float x = transform.position.x;
+            Vector2 inicio = new Vector2(transform.position.x, objetivo.position.y + desfaseY);
+
             if (seguirX)
             {
-                x = objetivo.position.x;
+                inicio.x = objetivo.position.x;
             }
 
-            transform.position = new Vector3(
-                LimitarX(x),
-                LimitarY(objetivo.position.y + desfaseY),
-                transform.position.z
-            );
+            inicio = LimitarAlNivel(inicio);
+            transform.position = new Vector3(inicio.x, inicio.y, transform.position.z);
         }
     }
 
     void LateUpdate()
     {
-        float xCamara = transform.position.x;
-        float yCamara = transform.position.y;
-
-        float xDestino = LimitarX(CalcularDestinoX(xCamara));
-        float yDestino = LimitarY(CalcularDestinoY(yCamara));
+        Vector2 destino = CalcularDestino();
+        destino = LimitarAlNivel(destino);
 
         float tiempoY = suavizado;
-        if (yDestino < yCamara)
+        if (destino.y < transform.position.y)
         {
             tiempoY = suavizadoBajada;
         }
 
-        float x = Mathf.SmoothDamp(xCamara, xDestino, ref velocidadX, suavizado);
-        float y = Mathf.SmoothDamp(yCamara, yDestino, ref velocidadY, tiempoY);
+        float x = Mathf.Lerp(transform.position.x, destino.x, Time.deltaTime / Mathf.Max(suavizado, 0.01f));
+        float y = Mathf.Lerp(transform.position.y, destino.y, Time.deltaTime / Mathf.Max(tiempoY, 0.01f));
 
         transform.position = new Vector3(x, y, transform.position.z);
     }
 
-    float CalcularDestinoY(float yCamara)
+    Vector2 CalcularDestino()
     {
+        Vector2 destino = transform.position;
+
         float yObjetivo = objetivo.position.y + desfaseY;
-        float yDestino = yCamara;
 
-        if (yObjetivo > yCamara + zonaMuertaArriba)
+        if (yObjetivo > destino.y + zonaMuertaArriba)
         {
-            yDestino = yObjetivo - zonaMuertaArriba;
+            destino.y = yObjetivo - zonaMuertaArriba;
         }
-        else if (yObjetivo < yCamara - zonaMuertaAbajo)
+        else if (yObjetivo < destino.y - zonaMuertaAbajo)
         {
-            yDestino = yObjetivo + zonaMuertaAbajo;
+            destino.y = yObjetivo + zonaMuertaAbajo;
         }
-
-        return yDestino;
-    }
-
-    float CalcularDestinoX(float xCamara)
-    {
-        float xDestino = xCamara;
 
         if (seguirX)
         {
-            float diferencia = objetivo.position.x - xCamara;
+            float diferencia = objetivo.position.x - destino.x;
 
             if (diferencia > zonaMuertaX)
             {
-                xDestino = objetivo.position.x - zonaMuertaX;
+                destino.x = objetivo.position.x - zonaMuertaX;
             }
             else if (diferencia < -zonaMuertaX)
             {
-                xDestino = objetivo.position.x + zonaMuertaX;
+                destino.x = objetivo.position.x + zonaMuertaX;
             }
         }
 
-        return xDestino;
+        return destino;
     }
 
-    float LimitarX(float x)
+    Vector2 LimitarAlNivel(Vector2 posicion)
     {
-        float resultado = x;
-
-        if (usarLimites)
-        {
-            float mitadAncho = camara.orthographicSize * camara.aspect;
-            resultado = Limitar(x, limiteIzquierdo + mitadAncho, limiteDerecho - mitadAncho);
-        }
-
-        return resultado;
-    }
-
-    float LimitarY(float y)
-    {
-        float resultado = y;
-
         if (usarLimites)
         {
             float mitadAlto = camara.orthographicSize;
-            resultado = Limitar(y, limiteInferior + mitadAlto, limiteSuperior - mitadAlto);
+            float mitadAncho = mitadAlto * camara.aspect;
+
+            posicion.x = Limitar(posicion.x, limiteIzquierdo + mitadAncho, limiteDerecho - mitadAncho);
+            posicion.y = Limitar(posicion.y, limiteInferior + mitadAlto, limiteSuperior - mitadAlto);
         }
 
-        return resultado;
+        return posicion;
     }
 
     float Limitar(float valor, float minimo, float maximo)

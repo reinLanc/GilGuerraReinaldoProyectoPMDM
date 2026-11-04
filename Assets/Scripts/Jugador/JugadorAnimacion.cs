@@ -1,41 +1,29 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
-
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(SpriteRenderer))]
-[DisallowMultipleComponent]
 public class JugadorAnimacion : MonoBehaviour
 {
-    private Animator animator;
-    private SpriteRenderer spriteRenderer;
-    private EstadoJugador? estadoActual = null;
+    Animator animator;
+    SpriteRenderer spriteRenderer;
+    EstadoJugador estadoActual = EstadoJugador.Parado;
 
-    private readonly Dictionary<EstadoJugador, int> hashes = new Dictionary<EstadoJugador, int>();
-
-    void Awake()
+    void Start()
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        foreach (EstadoJugador estado in Enum.GetValues(typeof(EstadoJugador)))
-        {
-            hashes[estado] = Animator.StringToHash(estado.ToString());
-        }
+        animator.Play(estadoActual.ToString());
     }
 
     public void CambiarEstado(EstadoJugador nuevoEstado)
     {
-        if (estadoActual != nuevoEstado)
+        if (nuevoEstado != estadoActual)
         {
             estadoActual = nuevoEstado;
-            animator.Play(hashes[nuevoEstado]);
+            animator.Play(nuevoEstado.ToString());
         }
     }
 
     public void MirarAIzquierda(bool izquierda)
     {
-        // flipX 
         spriteRenderer.flipX = izquierda;
     }
 }

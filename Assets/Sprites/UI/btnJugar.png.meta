@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2fe8e8df43eac524e81097aa3b2c4acf
+guid: a3377766f01e81a4aa9b21b8484d8849
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8992424083830631823
-    second: Gemini_Generated_Image_c068l2c068l2c068_0
+      213: 5988142591409489940
+    second: btnJugar_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,9 +46,9 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Gemini_Generated_Image_c068l2c068l2c068_0
+      name: btnJugar_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1376
-        height: 768
+        x: 48
+        y: 39
+        width: 770
+        height: 209
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1729b9d80fd743380800000000000000
-      internalID: -8992424083830631823
+      spriteID: 4188959d5f72a1350800000000000000
+      internalID: 5988142591409489940
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Gemini_Generated_Image_c068l2c068l2c068_0: -8992424083830631823
+      btnJugar_0: 5988142591409489940
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

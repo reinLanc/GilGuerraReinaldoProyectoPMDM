@@ -1,12 +1,9 @@
 using UnityEngine;
 
-
 public class MovimientoPlataforma : MonoBehaviour
 {
-    /*Parametros de la plataforma*/
     [SerializeField]
     float velocidad = 2f;
-
     [SerializeField]
     float recorrido = 4f;
     [SerializeField]
@@ -15,7 +12,6 @@ public class MovimientoPlataforma : MonoBehaviour
     float espera = 0f;
 
     Rigidbody2D rb2D;
-    Vector2 eje;
     float posInicial;
     float posFinal;
     int direccion = 1;
@@ -24,16 +20,6 @@ public class MovimientoPlataforma : MonoBehaviour
     void Start()
     {
         rb2D = GetComponent<Rigidbody2D>();
-
-        if (vertical)
-        {
-            eje = Vector2.up;
-        }
-        else
-        {
-            eje = Vector2.right;
-        }
-
         posInicial = PosicionEnEje();
         posFinal = posInicial + recorrido;
     }
@@ -46,15 +32,30 @@ public class MovimientoPlataforma : MonoBehaviour
         {
             rb2D.linearVelocity = Vector2.zero;
         }
+        else if (vertical)
+        {
+            rb2D.linearVelocity = new Vector2(0f, direccion * velocidad);
+        }
         else
         {
-            rb2D.linearVelocity = eje * direccion * velocidad;
+            rb2D.linearVelocity = new Vector2(direccion * velocidad, 0f);
         }
     }
 
     float PosicionEnEje()
     {
-        return Vector2.Dot(rb2D.position, eje);
+        float posicion;
+
+        if (vertical)
+        {
+            posicion = rb2D.position.y;
+        }
+        else
+        {
+            posicion = rb2D.position.x;
+        }
+
+        return posicion;
     }
 
     void ActualizarDireccion()

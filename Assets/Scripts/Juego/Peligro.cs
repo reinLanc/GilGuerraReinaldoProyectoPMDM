@@ -1,13 +1,11 @@
 using UnityEngine;
+
 public class Peligro : MonoBehaviour
 {
     [SerializeField]
     bool muerteInstantanea = true;
     [SerializeField]
     int dano = 1;
-
-    [SerializeField]
-    int RotacionTrampa = 90;
 
     void OnCollisionEnter2D(Collision2D collision)
     {

@@ -114,6 +114,7 @@ public class JugadorController : MonoBehaviour
     void Moverse()
     {
         rb2D.linearVelocityX = entradaX * velocidad + velocidadSuelo.x;
+    
     }
 
     void Saltar()

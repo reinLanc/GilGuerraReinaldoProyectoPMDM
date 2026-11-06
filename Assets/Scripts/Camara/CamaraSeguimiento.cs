@@ -10,16 +10,25 @@ public class CamaraSeguimiento : MonoBehaviour
 
     [SerializeField]
     float zonaMuertaArriba = 2f;
+
     [SerializeField]
     float zonaMuertaAbajo = 0.5f;
 
     [SerializeField]
     bool seguirX = true;
+
     [SerializeField]
-    float zonaMuertaX = 7f;
+    float zonaMuertaX = 2f;
+
+    [SerializeField]
+    float adelantoX = 3f;
 
     [SerializeField]
     float suavizado = 0.15f;
+
+    [SerializeField]
+    float suavizadoX = 0.3f;
+
     [SerializeField]
     float suavizadoBajada = 0.05f;
 
@@ -35,6 +44,7 @@ public class CamaraSeguimiento : MonoBehaviour
     float limiteSuperior = 48f;
 
     Camera camara;
+    SpriteRenderer spriteObjetivo;
 
     void Start()
     {
@@ -47,11 +57,12 @@ public class CamaraSeguimiento : MonoBehaviour
         }
         else
         {
+            spriteObjetivo = objetivo.GetComponent<SpriteRenderer>();
             Vector2 inicio = new Vector2(transform.position.x, objetivo.position.y + desfaseY);
 
             if (seguirX)
             {
-                inicio.x = objetivo.position.x;
+                inicio.x = XObjetivo();
             }
 
             inicio = LimitarAlNivel(inicio);
@@ -70,10 +81,27 @@ public class CamaraSeguimiento : MonoBehaviour
             tiempoY = suavizadoBajada;
         }
 
-        float x = Mathf.Lerp(transform.position.x, destino.x, Time.deltaTime / Mathf.Max(suavizado, 0.01f));
+        float x = Mathf.Lerp(transform.position.x, destino.x, Time.deltaTime / Mathf.Max(suavizadoX, 0.01f));
         float y = Mathf.Lerp(transform.position.y, destino.y, Time.deltaTime / Mathf.Max(tiempoY, 0.01f));
 
         transform.position = new Vector3(x, y, transform.position.z);
+    }
+
+    float DireccionMirada()
+    {
+        float direccion = 1f;
+
+        if (spriteObjetivo != null && spriteObjetivo.flipX)
+        {
+            direccion = -1f;
+        }
+
+        return direccion;
+    }
+
+    float XObjetivo()
+    {
+        return objetivo.position.x + DireccionMirada() * adelantoX;
     }
 
     Vector2 CalcularDestino()
@@ -93,15 +121,16 @@ public class CamaraSeguimiento : MonoBehaviour
 
         if (seguirX)
         {
-            float diferencia = objetivo.position.x - destino.x;
+            float xObjetivo = XObjetivo();
+            float diferencia = xObjetivo - destino.x;
 
             if (diferencia > zonaMuertaX)
             {
-                destino.x = objetivo.position.x - zonaMuertaX;
+                destino.x = xObjetivo - zonaMuertaX;
             }
             else if (diferencia < -zonaMuertaX)
             {
-                destino.x = objetivo.position.x + zonaMuertaX;
+                destino.x = xObjetivo + zonaMuertaX;
             }
         }
 

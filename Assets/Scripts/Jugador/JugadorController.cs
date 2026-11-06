@@ -136,6 +136,7 @@ public class JugadorController : MonoBehaviour
             {
                 rb2D.linearVelocityY = velocidadSalto;
                 saltosUsados++;
+                GestorAudio.Salto();
             }
 
             saltoPedido = false;

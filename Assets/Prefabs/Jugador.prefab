@@ -237,11 +237,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::JugadorSalud
   vidasMaximas: 3
-  vidasTope: 5
-  alturaDano: 7
+  vidasTope: 10
+  alturaDano: 10.5
   alturaPorVidaExtra: 7
   danoMaximoCaida: 2
-  alturaMortal: 30
+  alturaMortal: 27
   tiempoInvulnerable: 1
   duracionMorir: 0.6
   retrasoReinicio: 1.3
+  escenaGameOver: GameOver

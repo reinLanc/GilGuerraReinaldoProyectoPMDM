@@ -124,6 +124,7 @@ public class JugadorSalud : MonoBehaviour
             else
             {
                 finInvulnerabilidad = Time.time + tiempoInvulnerable;
+                GestorAudio.Dano();
             }
         }
     }
@@ -140,6 +141,7 @@ public class JugadorSalud : MonoBehaviour
             Vidas = 0;
 
             controlador.Morir();
+            GestorAudio.Morir();
             Invoke(nameof(Desvanecer), duracionMorir);
             Invoke(nameof(ReiniciarNivel), retrasoReinicio);
         }

@@ -34,6 +34,7 @@ public class Meta : MonoBehaviour
 
             animator.Play(estadoActivada);
             jugador.Desaparecer();
+            GestorAudio.Meta();
             Invoke(nameof(CargarSiguiente), retraso);
         }
     }

@@ -27,6 +27,7 @@ public class PinaVida : MonoBehaviour
         {
             recogida = true;
             colision.enabled = false;
+            GestorAudio.Recoger();
             animator.Play(estadoRecogida);
             Destroy(gameObject, duracionRecogida);
         }

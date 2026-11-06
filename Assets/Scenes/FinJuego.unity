@@ -306,7 +306,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1765893659}
-        m_TargetAssemblyTypeName: PantallaFinal, Assembly-CSharp
+        m_TargetAssemblyTypeName: GestorEscenas, Assembly-CSharp
         m_MethodName: Salir
         m_Mode: 1
         m_Arguments:
@@ -684,8 +684,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1765893659}
-        m_TargetAssemblyTypeName: PantallaFinal, Assembly-CSharp
-        m_MethodName: VolverAJugar
+        m_TargetAssemblyTypeName: GestorEscenas, Assembly-CSharp
+        m_MethodName: EmpezarPartida
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -742,7 +742,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1765893658}
-  - component: {fileID: 1765893657}
   - component: {fileID: 1765893659}
   m_Layer: 0
   m_Name: GestorFinJuego
@@ -751,19 +750,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1765893657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1765893656}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ba57584472d7d84cb9bae59eaf5ed7c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PantallaGameOver
-  menuInicio: Nivel1
 --- !u!4 &1765893658
 Transform:
   m_ObjectHideFlags: 0
@@ -788,9 +774,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1765893656}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c023507d28df524887304ab0619e008, type: 3}
+  m_Script: {fileID: 11500000, guid: 726e2ccd6bc22c140be571f6269b6e21, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PantallaFinal
+  m_EditorClassIdentifier: Assembly-CSharp::GestorEscenas
   escenaInicio: Nivel1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

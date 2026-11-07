@@ -140,6 +140,7 @@ GameObject:
   - component: {fileID: 257818478731406115}
   - component: {fileID: 6982275579806010996}
   - component: {fileID: 6747899220528578006}
+  - component: {fileID: 3288342784009982409}
   m_Layer: 0
   m_Name: GestorAudio
   m_TagString: Untagged
@@ -278,3 +279,15 @@ MonoBehaviour:
   sonidoDano: {fileID: 8300000, guid: b89c4fd3725478349b6eee3d2ebc93a1, type: 3}
   sonidoMorir: {fileID: 8300000, guid: 6d1565a4ab3aee94c8d91ca6f6960696, type: 3}
   sonidoMeta: {fileID: 8300000, guid: cb657570b3b7d33479ab2469fb10ba6a, type: 3}
+--- !u!114 &3288342784009982409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7586885886312638541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 548bb95e3d9b28f44bce59874c6b360e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SalidaJuego

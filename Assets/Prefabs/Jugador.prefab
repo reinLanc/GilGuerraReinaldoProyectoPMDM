@@ -113,10 +113,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   velocidad: 5
-  velocidadSalto: 12
+  velocidadSalto: 13
   maxSaltos: 2
   distanciaSuelo: 0.15
-  tiempoGracia: 0.1
 --- !u!50 &2688639767174373122
 Rigidbody2D:
   serializedVersion: 5
@@ -239,9 +238,9 @@ MonoBehaviour:
   vidasMaximas: 3
   vidasTope: 10
   alturaDano: 10.5
+  alturaMortal: 27
   alturaPorVidaExtra: 7
   danoMaximoCaida: 2
-  alturaMortal: 27
   tiempoInvulnerable: 1
   duracionMorir: 0.6
   retrasoReinicio: 1.3

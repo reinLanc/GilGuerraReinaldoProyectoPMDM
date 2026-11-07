@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3680633076119860482}
   - component: {fileID: 3234412785090583779}
   - component: {fileID: 732615447940080892}
+  - component: {fileID: 978908393291440014}
   m_Layer: 0
   m_Name: TrampaBolaVertical
   m_TagString: Untagged
@@ -142,9 +143,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 359ed23a071d1ea4489f2750ede996a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrampaVertical
-  velocidad: 2
-  alturaSubida: 3
-  alturaBajada: 3
+  velocidad: 4.3
+  alturaSubida: 3.5
+  alturaBajada: 0
 --- !u!114 &732615447940080892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,4 +160,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Peligro
   muerteInstantanea: 0
   dano: 1
-  RotacionTrampa: 90
+--- !u!114 &978908393291440014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5093018917559060784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e43e6a3a45a184429ac9c94693a4995, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RotacionTrampa
+  velocidadGiro: 180

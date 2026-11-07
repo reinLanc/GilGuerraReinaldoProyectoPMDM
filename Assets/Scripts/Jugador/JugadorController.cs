@@ -7,7 +7,8 @@ public class JugadorController : MonoBehaviour
     InputAction saltarAction;
     Rigidbody2D rb2D;
     BoxCollider2D boxCollider2d;
-    JugadorAnimacion animacion;
+    Animator animator;
+    SpriteRenderer spriteRenderer;
 
     [SerializeField]
     LayerMask suelo;
@@ -22,18 +23,17 @@ public class JugadorController : MonoBehaviour
     /*Deteccion de suelo*/
     [SerializeField]
     float distanciaSuelo = 0.15f;
-    [SerializeField]
-    float tiempoGracia = 0.1f;
 
-    float umbralVertical = 0.1f;
+    float finRetroceso = 0f;
+
+    float umbralSubida = 0.1f;
     float entradaX = 0f;
-    bool saltoPedido = false;
     bool enSuelo = false;
-    float ultimoContactoSuelo = -1f;
     Vector2 velocidadSuelo = Vector2.zero;
-    int saltosUsados = 0;
+    int numSaltos = 0;
     bool muerto = false;
     bool desapareciendo = false;
+    EstadoJugador estadoActual = EstadoJugador.Parado;
 
     public bool SinControl
     {
@@ -51,54 +51,33 @@ public class JugadorController : MonoBehaviour
         saltarAction = InputSystem.actions.FindAction("Saltar");
         rb2D = GetComponent<Rigidbody2D>();
         boxCollider2d = GetComponent<BoxCollider2D>();
-        animacion = GetComponent<JugadorAnimacion>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        animator.Play(estadoActual.ToString());
     }
 
     void Update()
     {
-        if (!SinControl)
+        ComprobarSuelo();
+
+        if (!SinControl && Time.time >= finRetroceso)
         {
-            LeerInput();
+            Moverse();
+            Saltar();
         }
 
         ActualizarAnimacion();
     }
 
-    void FixedUpdate()
-    {
-        ComprobarSuelo();
-
-        if (!SinControl)
-        {
-            Moverse();
-            Saltar();
-        }
-    }
-
-    void LeerInput()
-    {
-        entradaX = movimientoAction.ReadValue<Vector2>().x;
-        if (saltarAction.WasPressedThisFrame())
-        {
-            saltoPedido = true;
-        }
-    }
-
     void ComprobarSuelo()
     {
-        RaycastHit2D contacto = BuscarSuelo();
-        bool tocando = contacto.collider != null;
+        Collider2D piso = BuscarSuelo();
+        enSuelo = piso != null;
 
-        if (tocando)
+        if (enSuelo && piso.attachedRigidbody != null)
         {
-            ultimoContactoSuelo = Time.time;
-        }
-
-        enSuelo = Time.time - ultimoContactoSuelo <= tiempoGracia;
-
-        if (tocando && contacto.rigidbody != null)
-        {
-            velocidadSuelo = contacto.rigidbody.linearVelocity;
+            velocidadSuelo = piso.attachedRigidbody.linearVelocity;
         }
         else
         {
@@ -106,50 +85,55 @@ public class JugadorController : MonoBehaviour
         }
     }
 
-    float VelocidadVerticalPropia()
+    float VelocidadVertical()
     {
         return rb2D.linearVelocityY - velocidadSuelo.y;
     }
 
     void Moverse()
     {
+        entradaX = movimientoAction.ReadValue<Vector2>().x;
+
         rb2D.linearVelocityX = entradaX * velocidad + velocidadSuelo.x;
-    
     }
 
     void Saltar()
     {
-        bool estaSubiendo = VelocidadVerticalPropia() > umbralVertical;
+        bool subiendo = VelocidadVertical() > umbralSubida;
 
-        if (enSuelo && !estaSubiendo)
+        if (enSuelo && !subiendo)
         {
-            saltosUsados = 0;
+            numSaltos = 0;
         }
-        else if (!enSuelo && saltosUsados == 0)
+        else if (!enSuelo && numSaltos == 0)
         {
-            saltosUsados = 1;
+            numSaltos = 1;
         }
 
-        if (saltoPedido)
+        if (saltarAction.WasPressedThisFrame())
         {
-            if (saltosUsados < maxSaltos)
+            if (numSaltos == 0 || (numSaltos < maxSaltos && !subiendo))
             {
                 rb2D.linearVelocityY = velocidadSalto;
-                saltosUsados++;
+                numSaltos++;
                 GestorAudio.Salto();
             }
-
-            saltoPedido = false;
         }
     }
 
     void ActualizarAnimacion()
     {
-        animacion.CambiarEstado(CalcularEstado());
+        EstadoJugador nuevoEstado = CalcularEstado();
+
+        if (nuevoEstado != estadoActual)
+        {
+            estadoActual = nuevoEstado;
+            animator.Play(estadoActual.ToString());
+        }
 
         if (entradaX != 0f)
         {
-            animacion.MirarAIzquierda(entradaX < 0f);
+            spriteRenderer.flipX = entradaX < 0f;
         }
     }
 
@@ -166,9 +150,9 @@ public class JugadorController : MonoBehaviour
         {
             estado = EstadoJugador.Morir;
         }
-        else if (VelocidadVerticalPropia() > umbralVertical)
+        else if (VelocidadVertical() > umbralSubida)
         {
-            if (saltosUsados >= 2)
+            if (numSaltos >= 2)
             {
                 estado = EstadoJugador.DobleSalto;
             }
@@ -193,33 +177,35 @@ public class JugadorController : MonoBehaviour
         return estado;
     }
 
-    RaycastHit2D BuscarSuelo()
+    Collider2D BuscarSuelo()
     {
         Vector2 tamano = new Vector2(boxCollider2d.bounds.size.x - 0.1f, boxCollider2d.bounds.size.y);
+        Vector2 centro = (Vector2)boxCollider2d.bounds.center + Vector2.down * distanciaSuelo;
 
-        return Physics2D.BoxCast(
-            boxCollider2d.bounds.center,
-            tamano,
-            0f,
-            Vector2.down,
-            distanciaSuelo,
-            suelo
-        );
+        return Physics2D.OverlapBox(centro, tamano, 0f, suelo);
     }
 
     public void Morir()
     {
         muerto = true;
         entradaX = 0f;
-        saltoPedido = false;
         rb2D.linearVelocity = Vector2.zero;
+    }
+
+    public void Retroceder(Vector2 impulso, float duracion)
+    {
+        if (!SinControl)
+        {
+            entradaX = 0f;
+            finRetroceso = Time.time + duracion;
+            rb2D.linearVelocity = impulso;
+        }
     }
 
     public void Desaparecer()
     {
         desapareciendo = true;
         entradaX = 0f;
-        saltoPedido = false;
         rb2D.linearVelocity = Vector2.zero;
         rb2D.simulated = false;
     }

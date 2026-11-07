@@ -13,6 +13,15 @@ public class TrampaFuego : MonoBehaviour
     int dano = 1;
 
     [SerializeField]
+    Collider2D basePisable;
+    [SerializeField]
+    float fuerzaRetrocesoX = 6f;
+    [SerializeField]
+    float fuerzaRetrocesoY = 7f;
+    [SerializeField]
+    float duracionRetroceso = 0.3f;
+
+    [SerializeField]
     string estadoApagado = "Apagado";
     [SerializeField]
     string estadoAviso = "Encendiendo";
@@ -61,6 +70,7 @@ public class TrampaFuego : MonoBehaviour
         {
             fase = Fase.Encendido;
             animator.Play(estadoEncendido);
+            ActivarBase(false);
             zonaDano.enabled = true;
             proximoCambio = Time.time + tiempoEncendido;
         }
@@ -69,17 +79,33 @@ public class TrampaFuego : MonoBehaviour
             fase = Fase.Apagado;
             animator.Play(estadoApagado);
             zonaDano.enabled = false;
+            ActivarBase(true);
             proximoCambio = Time.time + tiempoApagado;
+        }
+    }
+
+    void ActivarBase(bool activo)
+    {
+        if(basePisable != null)
+        {
+            basePisable.enabled = activo;
         }
     }
 
     void OnTriggerStay2D(Collider2D otro)
     {
         JugadorSalud salud = otro.GetComponent<JugadorSalud>();
+        JugadorController jugador = otro.GetComponent<JugadorController>();
 
-        if (salud != null)
+        if (salud != null && salud.RecibirDano(dano) && jugador!= null)
         {
             salud.RecibirDano(dano);
         }
+    }
+
+    void Empujar(JugadorController jugador)
+    {
+        float lado = Mathf.Sign(jugador.transform.position.x - transform.position.x);
+        Vector2 impulso = new Vector2(lado * fuerzaRetrocesoX,fuerzaRetrocesoY);
     }
 }

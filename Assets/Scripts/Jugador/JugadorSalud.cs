@@ -6,23 +6,26 @@ public class JugadorSalud : MonoBehaviour
     [SerializeField]
     int vidasMaximas = 3;
     [SerializeField]
-    int vidasTope = 5;
+    int vidasTope = 10;
     [SerializeField]
-    float alturaDano = 7f;
+    float alturaDano = 10.5f;
+    [SerializeField]
+    float alturaMortal = 30f;
     [SerializeField]
     float alturaPorVidaExtra = 7f;
     [SerializeField]
     int danoMaximoCaida = 2;
-    [SerializeField]
-    float alturaMortal = 30f;
+
     [SerializeField]
     float tiempoInvulnerable = 1f;
     [SerializeField]
     float duracionMorir = 0.6f;
     [SerializeField]
     float retrasoReinicio = 1.3f;
+
     [SerializeField]
     string escenaGameOver = "GameOver";
+
     public int Vidas { get; private set; }
 
     JugadorController controlador;
@@ -38,6 +41,7 @@ public class JugadorSalud : MonoBehaviour
         {
             DatosPartida.vidasInicioNivel = vidasMaximas;
         }
+
         Vidas = Mathf.Clamp(DatosPartida.vidasInicioNivel, 1, vidasTope);
     }
 
@@ -51,10 +55,7 @@ public class JugadorSalud : MonoBehaviour
     void Update()
     {
         ActualizarParpadeo();
-    }
 
-    void FixedUpdate()
-    {
         if (!controlador.SinControl)
         {
             ControlarCaida();
@@ -109,7 +110,7 @@ public class JugadorSalud : MonoBehaviour
         return puedeGanar;
     }
 
-    public void RecibirDano(int cantidad)
+    public bool RecibirDano(int cantidad)
     {
         bool puedeRecibir = !controlador.SinControl && Time.time >= finInvulnerabilidad;
 
@@ -127,6 +128,7 @@ public class JugadorSalud : MonoBehaviour
                 GestorAudio.Dano();
             }
         }
+        return puedeRecibir;
     }
 
     public void GuardarVidasParaSiguienteNivel()
@@ -143,7 +145,7 @@ public class JugadorSalud : MonoBehaviour
             controlador.Morir();
             GestorAudio.Morir();
             Invoke(nameof(Desvanecer), duracionMorir);
-            Invoke(nameof(ReiniciarNivel), retrasoReinicio);
+            Invoke(nameof(IrAGameOver), retrasoReinicio);
         }
     }
 
@@ -152,9 +154,8 @@ public class JugadorSalud : MonoBehaviour
         controlador.Desaparecer();
     }
 
-    void ReiniciarNivel()
+    void IrAGameOver()
     {
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         SceneManager.LoadScene(escenaGameOver);
     }
 

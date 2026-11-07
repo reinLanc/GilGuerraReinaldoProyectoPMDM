@@ -7,33 +7,10 @@ public class CamaraSeguimiento : MonoBehaviour
 
     [SerializeField]
     float desfaseY = 1.5f;
-
     [SerializeField]
-    float zonaMuertaArriba = 2f;
+    float velocidadSeguimiento = 5f;
 
-    [SerializeField]
-    float zonaMuertaAbajo = 0.5f;
 
-    [SerializeField]
-    bool seguirX = true;
-
-    [SerializeField]
-    float zonaMuertaX = 2f;
-
-    [SerializeField]
-    float adelantoX = 3f;
-
-    [SerializeField]
-    float suavizado = 0.15f;
-
-    [SerializeField]
-    float suavizadoX = 0.3f;
-
-    [SerializeField]
-    float suavizadoBajada = 0.05f;
-
-    [SerializeField]
-    bool usarLimites = true;
     [SerializeField]
     float limiteIzquierdo = -10f;
     [SerializeField]
@@ -44,7 +21,6 @@ public class CamaraSeguimiento : MonoBehaviour
     float limiteSuperior = 48f;
 
     Camera camara;
-    SpriteRenderer spriteObjetivo;
 
     void Start()
     {
@@ -57,133 +33,27 @@ public class CamaraSeguimiento : MonoBehaviour
         }
         else
         {
-            spriteObjetivo = objetivo.GetComponent<SpriteRenderer>();
-            Vector2 inicio = new Vector2(transform.position.x, objetivo.position.y + desfaseY);
-
-            if (seguirX)
-            {
-                inicio.x = XObjetivo();
-            }
-
-            inicio = LimitarAlNivel(inicio);
-            transform.position = new Vector3(inicio.x, inicio.y, transform.position.z);
+            transform.position = CalcularDestino();
         }
     }
 
     void LateUpdate()
     {
-        Vector2 destino = CalcularDestino();
-        destino = LimitarAlNivel(destino);
-
-        float tiempoY = suavizado;
-        if (destino.y < transform.position.y)
-        {
-            tiempoY = suavizadoBajada;
-        }
-
-        float x = Mathf.Lerp(transform.position.x, destino.x, Time.deltaTime / Mathf.Max(suavizadoX, 0.01f));
-        float y = Mathf.Lerp(transform.position.y, destino.y, Time.deltaTime / Mathf.Max(tiempoY, 0.01f));
-
-        transform.position = new Vector3(x, y, transform.position.z);
+        transform.position = Vector3.Lerp(
+            transform.position,
+            CalcularDestino(),
+            velocidadSeguimiento * Time.deltaTime
+        );
     }
 
-    float DireccionMirada()
+    Vector3 CalcularDestino()
     {
-        float direccion = 1f;
+        float mitadAlto = camara.orthographicSize;
+        float mitadAncho = mitadAlto * camara.aspect;
 
-        if (spriteObjetivo != null && spriteObjetivo.flipX)
-        {
-            direccion = -1f;
-        }
+        float x = Mathf.Clamp(objetivo.position.x, limiteIzquierdo + mitadAncho, limiteDerecho - mitadAncho);
+        float y = Mathf.Clamp(objetivo.position.y + desfaseY, limiteInferior + mitadAlto, limiteSuperior - mitadAlto);
 
-        return direccion;
-    }
-
-    float XObjetivo()
-    {
-        return objetivo.position.x + DireccionMirada() * adelantoX;
-    }
-
-    Vector2 CalcularDestino()
-    {
-        Vector2 destino = transform.position;
-
-        float yObjetivo = objetivo.position.y + desfaseY;
-
-        if (yObjetivo > destino.y + zonaMuertaArriba)
-        {
-            destino.y = yObjetivo - zonaMuertaArriba;
-        }
-        else if (yObjetivo < destino.y - zonaMuertaAbajo)
-        {
-            destino.y = yObjetivo + zonaMuertaAbajo;
-        }
-
-        if (seguirX)
-        {
-            float xObjetivo = XObjetivo();
-            float diferencia = xObjetivo - destino.x;
-
-            if (diferencia > zonaMuertaX)
-            {
-                destino.x = xObjetivo - zonaMuertaX;
-            }
-            else if (diferencia < -zonaMuertaX)
-            {
-                destino.x = xObjetivo + zonaMuertaX;
-            }
-        }
-
-        return destino;
-    }
-
-    Vector2 LimitarAlNivel(Vector2 posicion)
-    {
-        if (usarLimites)
-        {
-            float mitadAlto = camara.orthographicSize;
-            float mitadAncho = mitadAlto * camara.aspect;
-
-            posicion.x = Limitar(posicion.x, limiteIzquierdo + mitadAncho, limiteDerecho - mitadAncho);
-            posicion.y = Limitar(posicion.y, limiteInferior + mitadAlto, limiteSuperior - mitadAlto);
-        }
-
-        return posicion;
-    }
-
-    float Limitar(float valor, float minimo, float maximo)
-    {
-        float resultado;
-
-        if (minimo > maximo)
-        {
-            resultado = (minimo + maximo) / 2f;
-        }
-        else
-        {
-            resultado = Mathf.Clamp(valor, minimo, maximo);
-        }
-
-        return resultado;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        if (usarLimites)
-        {
-            Vector3 centro = new Vector3(
-                (limiteIzquierdo + limiteDerecho) / 2f,
-                (limiteInferior + limiteSuperior) / 2f,
-                0f
-            );
-            Vector3 tamano = new Vector3(
-                limiteDerecho - limiteIzquierdo,
-                limiteSuperior - limiteInferior,
-                0f
-            );
-
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawWireCube(centro, tamano);
-        }
+        return new Vector3(x, y, transform.position.z);
     }
 }

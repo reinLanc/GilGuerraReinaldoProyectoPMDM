@@ -99,7 +99,7 @@ public class TrampaFuego : MonoBehaviour
 
         if (salud != null && salud.RecibirDano(dano) && jugador!= null)
         {
-            salud.RecibirDano(dano);
+            Empujar(jugador);
         }
     }
 
@@ -107,5 +107,7 @@ public class TrampaFuego : MonoBehaviour
     {
         float lado = Mathf.Sign(jugador.transform.position.x - transform.position.x);
         Vector2 impulso = new Vector2(lado * fuerzaRetrocesoX,fuerzaRetrocesoY);
+
+        jugador.Retroceder(impulso, duracionRetroceso);
     }
 }

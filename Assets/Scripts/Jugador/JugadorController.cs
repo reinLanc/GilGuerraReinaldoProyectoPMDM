@@ -24,15 +24,14 @@ public class JugadorController : MonoBehaviour
     [SerializeField]
     float distanciaSuelo = 0.15f;
 
-    float finRetroceso = 0f;
-
     float umbralSubida = 0.1f;
+    float finRetroceso = 0f;
     float entradaX = 0f;
-    bool enSuelo = false;
-    Vector2 velocidadSuelo = Vector2.zero;
     int numSaltos = 0;
+    bool enSuelo = false;
     bool muerto = false;
     bool desapareciendo = false;
+    Vector2 velocidadSuelo = Vector2.zero;
     EstadoJugador estadoActual = EstadoJugador.Parado;
 
     public bool SinControl
@@ -72,17 +71,37 @@ public class JugadorController : MonoBehaviour
 
     void ComprobarSuelo()
     {
-        Collider2D piso = BuscarSuelo();
-        enSuelo = piso != null;
+        enSuelo = EstaTocandoSuelo();
+        velocidadSuelo = Vector2.zero;
 
-        if (enSuelo && piso.attachedRigidbody != null)
+        if (enSuelo)
         {
-            velocidadSuelo = piso.attachedRigidbody.linearVelocity;
+            Rigidbody2D plataforma = LanzarCaja().rigidbody;
+
+            if (plataforma != null)
+            {
+                velocidadSuelo = plataforma.linearVelocity;
+            }
         }
-        else
-        {
-            velocidadSuelo = Vector2.zero;
-        }
+    }
+
+    bool EstaTocandoSuelo()
+    {
+        return LanzarCaja();
+    }
+
+    RaycastHit2D LanzarCaja()
+    {
+        Vector2 tamano = new Vector2(boxCollider2d.bounds.size.x - 0.1f, boxCollider2d.bounds.size.y);
+
+        return Physics2D.BoxCast(
+            boxCollider2d.bounds.center,
+            tamano,
+            0f,
+            Vector2.down,
+            distanciaSuelo,
+            suelo
+        );
     }
 
     float VelocidadVertical()
@@ -93,7 +112,6 @@ public class JugadorController : MonoBehaviour
     void Moverse()
     {
         entradaX = movimientoAction.ReadValue<Vector2>().x;
-
         rb2D.linearVelocityX = entradaX * velocidad + velocidadSuelo.x;
     }
 
@@ -101,24 +119,33 @@ public class JugadorController : MonoBehaviour
     {
         bool subiendo = VelocidadVertical() > umbralSubida;
 
-        if (enSuelo && !subiendo)
+        if (EstaTocandoSuelo() && !subiendo)
         {
             numSaltos = 0;
         }
-        else if (!enSuelo && numSaltos == 0)
+        else if (!EstaTocandoSuelo() && numSaltos == 0)
         {
-            numSaltos = 1;
+            numSaltos = 1;  
         }
 
         if (saltarAction.WasPressedThisFrame())
         {
-            if (numSaltos == 0 || (numSaltos < maxSaltos && !subiendo))
+            if (EstaTocandoSuelo() && !subiendo)
             {
-                rb2D.linearVelocityY = velocidadSalto;
-                numSaltos++;
-                GestorAudio.Salto();
+                Impulsar();
+            }
+            else if (!EstaTocandoSuelo() && !subiendo && numSaltos < maxSaltos)
+            {
+                Impulsar();
             }
         }
+    }
+
+    void Impulsar()
+    {
+        rb2D.linearVelocityY = velocidadSalto;
+        numSaltos++;
+        GestorAudio.Salto();
     }
 
     void ActualizarAnimacion()
@@ -139,7 +166,7 @@ public class JugadorController : MonoBehaviour
 
     EstadoJugador CalcularEstado()
     {
-        EstadoJugador estado;
+        EstadoJugador estado = EstadoJugador.Parado;
 
         // El orden importa pq gana la primera condicion que se cumple
         if (desapareciendo)
@@ -152,14 +179,8 @@ public class JugadorController : MonoBehaviour
         }
         else if (VelocidadVertical() > umbralSubida)
         {
-            if (numSaltos >= 2)
-            {
-                estado = EstadoJugador.DobleSalto;
-            }
-            else
-            {
-                estado = EstadoJugador.Saltar;
-            }
+            estado = EstadoJugador.Saltar;
+            if (numSaltos >= 2) estado = EstadoJugador.DobleSalto;
         }
         else if (!enSuelo)
         {
@@ -169,27 +190,27 @@ public class JugadorController : MonoBehaviour
         {
             estado = EstadoJugador.Correr;
         }
-        else
-        {
-            estado = EstadoJugador.Parado;
-        }
 
         return estado;
     }
 
-    Collider2D BuscarSuelo()
+    void Detener()
     {
-        Vector2 tamano = new Vector2(boxCollider2d.bounds.size.x - 0.1f, boxCollider2d.bounds.size.y);
-        Vector2 centro = (Vector2)boxCollider2d.bounds.center + Vector2.down * distanciaSuelo;
-
-        return Physics2D.OverlapBox(centro, tamano, 0f, suelo);
+        entradaX = 0f;
+        rb2D.linearVelocity = Vector2.zero;
     }
 
     public void Morir()
     {
         muerto = true;
-        entradaX = 0f;
-        rb2D.linearVelocity = Vector2.zero;
+        Detener();
+    }
+
+    public void Desaparecer()
+    {
+        desapareciendo = true;
+        Detener();
+        rb2D.simulated = false;
     }
 
     public void Retroceder(Vector2 impulso, float duracion)
@@ -200,13 +221,5 @@ public class JugadorController : MonoBehaviour
             finRetroceso = Time.time + duracion;
             rb2D.linearVelocity = impulso;
         }
-    }
-
-    public void Desaparecer()
-    {
-        desapareciendo = true;
-        entradaX = 0f;
-        rb2D.linearVelocity = Vector2.zero;
-        rb2D.simulated = false;
     }
 }

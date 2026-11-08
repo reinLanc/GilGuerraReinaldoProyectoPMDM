@@ -208,6 +208,6 @@ Incluye mayor recorrido horizontal y menos caídas entre plataformas, pero mucha
 
 **Versión ejecutable**
 
-1. juego-ejecutable Windows
+1. Para Windows directorio `juego ejecutable` contiene archivo `.exe`.
 2. Ejecuta el `.exe`. Con `Esc` o el botón **Salir** se cierra el juego.
 

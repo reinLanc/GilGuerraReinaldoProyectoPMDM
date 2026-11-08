@@ -1,6 +1,10 @@
 ﻿# Pinkman
 
-Juego de plataformas 2D hecho con **Unity 6 (6000.3 LTS)** y C#. Controlas a Pinkman a través de tres niveles llenos de plataformas, trampas y piñas, intentando llegar a la bandera de meta sin quedarte sin vidas.
+Juego de plataformas 2D hecho con Unity 6 (6000.3 LTS) y C#. Controlas a Pinkman, un personaje que corre, salta y puede hacer doble salto, a través de tres niveles llenos de plataformas fijas y móviles, trampas y piñas coleccionables. El objetivo es llegar a la bandera de meta de cada nivel sin quedarte sin vidas.
+
+El juego combina precisión en el salto con gestión de riesgo: las caídas largas hacen daño según la altura, las diversas trampas obligan a calcular el momento de pasar, y las piñas devuelven vidas a quien sepa dónde buscarlas. Las vidas se conservan de un nivel a otro, así que cada error cuenta hasta el final.
+
+El proyecto incluye animaciones por estados, música y efectos de sonido, cámara con límites por nivel, niveles construidos con Tilemaps y pantallas de inicio, Game Over y final.
 
 > **Autor:** Reinaldo Antonio Gil Guerra
 
@@ -58,19 +62,20 @@ La altura de la caída se mide desde el punto más alto alcanzado hasta el suelo
 
 | Caída (unidades de Unity) | Efecto |
 |---|---|
-| Menos de 10.5 | Sin daño (un doble salto nunca hace daño) |
+| Menos de 10.5 | Sin daño |
 | De 10.5 a 17.5 | Pierdes **1 vida** |
-| De 17.5 a 30 | Pierdes **2 vidas** (máximo por caída) |
-| 30 o más | **Muerte** instantánea |
+| De 17.5 a 27 | Pierdes **2 vidas** (máximo por caída) |
+| 27 o más | **Muerte** instantánea |
 
 ### 3.3 Invulnerabilidad y retroceso
 
 - Tras recibir daño, Pinkman es **invulnerable durante 1 segundo** y parpadea para indicarlo.
-- Al tocar una trampa (fuego o bola de pinchos) el personaje **rebota hacia atrás** y recupera el control en una fracción de segundo.
+- Al tocar el **fuego** o la **bola de pinchos** el personaje **rebota hacia atrás** (fuerza 6 en horizontal y 7 en vertical) y pierde el control durante **0,3 s**.
+- El **aplastador** no hace retroceder sino que mata directamente al detectar la colisión (componente `Peligro` con *Muerte instantánea* marcada).
 
 ### 3.4 Muerte
 
-Se muere al quedarte sin vidas, con una caída mortal o con una trampa de muerte instantánea. Se reproduce la animación de morir, luego el efecto de desaparecer y se carga la pantalla de **Game Over**.
+Se muere al quedarte sin vidas, con una caída mortal o al tocar una trampa de muerte instantánea (el aplastador). Se reproduce la animación de morir, luego el efecto de desaparecer y se carga la pantalla de Game Over.
 
 ### 3.5 Meta y paso de nivel
 
@@ -79,7 +84,7 @@ Al tocar la **bandera** el personaje desaparece con un efecto, suena un sonido y
 ### 3.6 Cámara y sonido
 
 - La cámara sigue al jugador y nunca muestra nada fuera de los límites de cada nivel.
-- Hay **música de fondo** continua entre escenas y efectos de sonido para salto, recoger piña, recibir daño, morir y llegar a la meta. Game Over y el final tienen su propio sonido.
+- Hay **música de fondo** continua entre escenas y efectos de sonido para salto, recoger piña, recibir daño, morir y llegar a la meta.
 
 ## 4. Cómo se ganan y se pierden vidas
 
@@ -95,8 +100,9 @@ Al tocar la **bandera** el personaje desaparece con un efecto, suena un sonido y
 | Cómo | Detalle |
 |---|---|
 | Caída larga | 1 o 2 vidas según la altura (ver [3.2](#32-daño-por-caídas)) |
-| Tocar el **fuego** | Daño |
-| Tocar la **bola de pinchos** | Daño] |
+| Tocar el **fuego** | **1 vida** y retroceso haciendo daño solo cuando está encendido |
+| Tocar la **bola de pinchos** | **1 vida** y retroceso |
+| Tocar el **aplastador** | **Muerte instantánea**: se pierden todas las vidas |
 | Caída mortal | Se pierden todas las vidas |
 
 Las vidas se muestran en la esquina superior izquierda, junto al icono de la piña.
@@ -113,8 +119,9 @@ Las vidas se muestran en la esquina superior izquierda, junto al icono de la pi�
 | **Plataformas móviles** | Se desplazan en horizontal o en vertical y llevan al jugador encima |
 | **Terreno** | Muros y suelo hechos con Tilemaps |
 | **Piña** | Objeto coleccionable animado que da una vida |
-| **Fuego** | Trampa que se enciende y se apaga durante 5 segundos. Encendido hace daño pero apagado funciona como una plataforma más |
+| **Fuego** | Trampa que alterna: apagado unos 2 s durante este tiempo se puede pisar como una plataforma más, un breve aviso de 0,4 s y encendido 2 s el cual hace daño al contacto. |
 | **Bola de pinchos** | Trampa que sube y baja entre dos alturas, hay que saltarla o pasar por debajo |
+| **Aplastador** | Trampa que sube despacio y **cae muy rápido**, ejecutando su Animator al caer y **mata al contacto** |
 | **Bandera de meta** | Termina el nivel |
 
 <img width="948" height="535" alt="plataformas" src="https://github.com/user-attachments/assets/17e5cdcc-61c0-4c04-9405-51b7d901bef1" />
@@ -126,14 +133,20 @@ Las vidas se muestran en la esquina superior izquierda, junto al icono de la pi�
 
 ## 6. Niveles
 
-| Nivel | Descripción | Captura |
-|---|---|---|
-| **Nivel 1** | Primer nivel e indicación de controles | <img width="951" height="531" alt="nivel1" src="https://github.com/user-attachments/assets/47a9673f-7c1d-491c-bb52-dcb64138d8a2" />
- |
-| **Nivel 2** | Zona subterranea tramo horizontal | <img width="942" height="541" alt="nivel2" src="https://github.com/user-attachments/assets/838d0e52-98af-4c46-be8c-4dd8c8c34188" />
- |
-| **Nivel 3** | Etapa horizontal mas prolongada en este nivel | <img width="946" height="535" alt="image" src="https://github.com/user-attachments/assets/d39a225c-0a65-41d0-943e-5a30057d8327" />
- |
+### Nivel 1
+Primer nivel: plataformas sencillas, primera piña y el texto con los controles. Nivel totalmente en vertical.
+
+<img src="https://github.com/user-attachments/assets/47a9673f-7c1d-491c-bb52-dcb64138d8a2" alt="Nivel 1" width="640" />
+
+### Nivel 2
+Más complejo que el anterior. Incluye tramos de recorrido horizontal y presenta una nueva trampa aplastadora que produce muerte instantánea, agotando todas las vidas.
+
+<img src="https://github.com/user-attachments/assets/5ccc8d03-b6e4-495f-b78e-b6facb71e452" alt="Nivel 2" width="640" />
+
+### Nivel 3
+Incluye mayor recorrido horizontal y menos caídas entre plataformas, pero muchas más trampas en poco espacio.
+
+<img src="https://github.com/user-attachments/assets/d39a225c-0a65-41d0-943e-5a30057d8327" alt="Nivel 3" width="640" />
 
 ## 7. Pantallas de inicio, Game Over y final
 
@@ -173,16 +186,17 @@ Las vidas se muestran en la esquina superior izquierda, junto al icono de la pi�
 | `CamaraSeguimiento` | Cámara que sigue al jugador con límites por nivel |
 | `MovimientoPlataforma` | Plataformas móviles (horizontal o vertical) |
 | `Peligro` | Trampas que dañan o matan al jugador al tocarlas |
-| `TrampaVertical` | Bola de pinchos que sube y baja |
+| `TrampaVertical` | Trampa que sube y baja entre dos alturas, con velocidad de subida y de bajada independientes y pausas (bola de pinchos y aplastador) |
+| `RotacionTrampa` | Hace girar la bola de pinchos sobre sí misma a velocidad constante |
+| `AplastadorAnimacion` | Cambia la animación de la trampa Aplastador según su estado |
 | `PinaVida` | Piña que devuelve una vida |
 | `Meta` | Bandera que termina el nivel y guarda las vidas |
 | `DatosPartida` | Guarda las vidas entre niveles |
 | `HUDVidas` | Muestra las vidas en pantalla |
 | `TextoTemporal` | Texto de controles que se desvanece |
 | `GestorAudio` | Música de fondo y efectos de sonido |
-| `SonidoAlEntrar` | Sonido al cargar Game Over y la pantalla final |
 | `GestorEscenas` | Botones de jugar, reiniciar y salir |
-| `SalirConEscape` | Cierra el juego con la tecla `Esc` |
+| `SalidaJuego` | Cierra el juego con la tecla `Esc` |
 
 ## 9. Cómo ejecutarlo
 
